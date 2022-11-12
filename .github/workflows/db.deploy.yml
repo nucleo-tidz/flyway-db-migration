@@ -28,9 +28,9 @@ jobs:
       - name: flyway info
         uses: ./.github/actions/flyway
         with: 
-          url: ${{ secrets.sql-server-name }}
-          user: ${{ secrets.sql-server-user-name }}
-          password: ${{ secrets.sql-server-user-pwd }}
+          url: ${{ secrets.SERVER_NAME }}
+          user: ${{ secrets.USERNAME}}
+          password: ${{ secrets.PASSWORD}}
           locations: /db-migrations
           command: info
           table: version_history
@@ -38,9 +38,9 @@ jobs:
       - name: flyway mig
         uses: ./.github/actions/flyway
         with: 
-          url: ${{ secrets.sql-server-name }}
-          user: ${{ secrets.sql-server-user-name }}
-          password: ${{ secrets.sql-server-user-pwd }}
+          url: ${{ secrets.SERVER_NAME }}
+          user: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
           locations: /db-migrations/developers
           command: migrate
           table: version_history
