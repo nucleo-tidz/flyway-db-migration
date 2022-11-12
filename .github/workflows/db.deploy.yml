@@ -1,0 +1,46 @@
+name: db.migration.cicd
+on:
+  push:
+    branches:
+      - main
+      - 'release-**'
+    paths:
+      - '.github/workflows/db.migration.cicd.yml'
+      - 'db-migrations/**'
+      - '.github/actions/flyway/**'
+
+  workflow_dispatch:
+   inputs:
+    enableManualDeployement :
+      description: 'Click to enable manual deployment from a custom branch to the test environment.'
+      default: false
+      required: true
+      type: boolean
+
+jobs:
+  publish-test:
+    name: deploy-test
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.enableManualDeployement == 'true' || github.ref == 'refs/heads/main' }}
+    environment: 'test'
+    steps:
+      - uses: actions/checkout@v2
+      - name: flyway info
+        uses: ./.github/actions/flyway
+        with: 
+          url: ${{ secrets.sql-server-name }}
+          user: ${{ secrets.sql-server-user-name }}
+          password: ${{ secrets.sql-server-user-pwd }}
+          locations: /db-migrations
+          command: info
+          table: version_history
+
+      - name: flyway mig
+        uses: ./.github/actions/flyway
+        with: 
+          url: ${{ secrets.sql-server-name }}
+          user: ${{ secrets.sql-server-user-name }}
+          password: ${{ secrets.sql-server-user-pwd }}
+          locations: /db-migrations/developers
+          command: migrate
+          table: version_history
